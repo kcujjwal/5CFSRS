@@ -16,4 +16,3 @@ pandas
 pytk
 pyppeteer==0.2.5
 tk
-
