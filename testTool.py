@@ -253,7 +253,7 @@ def linePlot1(df,countrySelect,conPlots):
             plt.ylabel(None)
             plt.ylim([-5,105])
             plt.legend(loc='center left',bbox_to_anchor=(1.1, 0.5),prop={'size': 5})
-            plt.show()
+            #plt.show()
             conPlots.pyplot(fig2)
             
 
