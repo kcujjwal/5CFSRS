@@ -1,2 +1,2 @@
 libglib2.0-0
-libtk8.6.so
+libtk
