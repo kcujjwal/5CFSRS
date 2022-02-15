@@ -133,7 +133,7 @@ DATA_URL = r"C:\Users\kc003\OneDrive - CSIRO\Projects\Composite Score\masterData
 years = range(2012,2021)
 dataColl = {}
 for i in years:
-    abc = pd.read_csv('../'+str(i)+'.csv',index_col= 'Country').transpose()
+    abc = pd.read_csv(str(i)+'.csv',index_col= 'Country').transpose()
     # dataColl[i] = pd.read_csv(DATA_URL + "\\"+str(i)+'.csv',index_col= 'Country')
     dataColl[i] = abc
 # org_data=pd.read_csv(DATA_URL + "\\"+str(2012)+'.csv',index_col= 'Country')
