@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 from streamlit import caching
 from validators import length
 
+
 import copy
 
 from pathlib import Path
@@ -126,12 +127,13 @@ def load_data(data_url):
     data=pd.read_csv(data_url)
     return data
 
+DATA_URL = r"C:\Users\kc003\OneDrive - CSIRO\Projects\Composite Score\masterDataset\Yearwisedata"
 
 
 years = range(2012,2021)
 dataColl = {}
 for i in years:
-    abc = pd.read_csv(str(i)+'.csv',index_col= 'Country').transpose()
+    abc = pd.read_csv('../'+str(i)+'.csv',index_col= 'Country').transpose()
     # dataColl[i] = pd.read_csv(DATA_URL + "\\"+str(i)+'.csv',index_col= 'Country')
     dataColl[i] = abc
 # org_data=pd.read_csv(DATA_URL + "\\"+str(2012)+'.csv',index_col= 'Country')
@@ -253,7 +255,7 @@ def linePlot1(df,countrySelect,conPlots):
             plt.ylabel(None)
             plt.ylim([-5,105])
             plt.legend(loc='center left',bbox_to_anchor=(1.1, 0.5),prop={'size': 5})
-            #plt.show()
+            plt.show()
             conPlots.pyplot(fig2)
             
 
