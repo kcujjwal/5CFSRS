@@ -17,11 +17,7 @@ from streamlit import caching
 from validators import length
 
 import copy
-from statsmodels.tsa.arima_process import ArmaProcess 
-from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
-from statsmodels.tsa.stattools import adfuller 
-from statsmodels.tsa.arima_model import ARMA
-import statsmodels.api as sm
+
 from pathlib import Path
 import seaborn as sns
 import geopandas
@@ -130,13 +126,12 @@ def load_data(data_url):
     data=pd.read_csv(data_url)
     return data
 
-DATA_URL = r"C:\Users\kc003\OneDrive - CSIRO\Projects\Composite Score\masterDataset\Yearwisedata"
 
 
 years = range(2012,2021)
 dataColl = {}
 for i in years:
-    abc = pd.read_csv(DATA_URL + "\\"+str(i)+'.csv',index_col= 'Country').transpose()
+    abc = pd.read_csv(str(i)+'.csv',index_col= 'Country').transpose()
     # dataColl[i] = pd.read_csv(DATA_URL + "\\"+str(i)+'.csv',index_col= 'Country')
     dataColl[i] = abc
 # org_data=pd.read_csv(DATA_URL + "\\"+str(2012)+'.csv',index_col= 'Country')
