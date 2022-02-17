@@ -150,34 +150,77 @@ def showOption():
     op = st.sidebar.selectbox('Analysis by:',opts)
     return op
 
-def showPlot(df,c1,c2,visType="Des"):
-    # df=df.transpose()
-    # c1.write(df)
-    df.index.name=None
-    plt.style.use(plt_style)
-    for i in df.columns:
-        c1.write(str.upper(i))
-        fig,axs = plt.subplots(figsize=(6,4))
+# def showPlot(df,c1,c2,visType="Des"):
+#     # df=df.transpose()
+#     # c1.write(df)
+#     df.index.name=None
+#     plt.style.use(plt_style)
+#     for i in df.columns:
+#         c1.write(str.upper(i))
+#         fig,axs = plt.subplots(figsize=(6,4))
             
         
-        # c1.write(df[i].sort_values(ascending= False).head(10))
-        df[i].sort_values(ascending= False).head(10).plot.barh()
-        plt.xlim([0,100])
-        # plt.show()
-        c1.pyplot(fig)
+#         # c1.write(df[i].sort_values(ascending= False).head(10))
+#         df[i].sort_values(ascending= False).head(10).plot.barh()
+#         plt.xlim([0,100])
+#         # plt.show()
+#         c1.pyplot(fig)
+
+#         c2.write(str.upper(i))
+#         # c2.write(df[i].sort_values(ascending= True).head(10))
+#         fig1,axs1 = plt.subplots(figsize=(6,4))
+#         # plt.style.use(plt_style)
+#         # c1.write(df[i].sort_values(ascending= False).head(10))
+#         df[i].sort_values(ascending= True).head(10).plot.barh()
+#         if(visType=="Des"):
+#             plt.xlim([0,100])
+#         else:
+#             plt.xlim([-50,5])
+#         # plt.show()
+#         c2.pyplot(fig1)
+
+def showPlot(df,c1,c2,visType="Des"):
+    print(df)
+    # df=df.transpose()
+    # c1.write(df)
+    # df.index.name=None
+    plt.style.use(plt_style)
+    for i in df.columns:
+        # print(i)
+        c1.write(str.upper(i))
+        # fig,axs = plt.subplots(figsize=(6,4))
+        # df[i].sort_values(ascending= False).head(10).plot.barh()
+        # plt.xlim([0,100])
+        # # plt.show()
+        # c1.pyplot(fig)
+
+        # px.bar()
+        # print(df[i])
+        best_10 = df.sort_values(i,ascending = False)[i].head(10)
+
+        fig1 = px.bar(best_10, x = i,y = best_10.index,orientation='h')
+        fig1.update_layout(xaxis_range=[0,100],yaxis_title=None, xaxis_title=None)
+        fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
+        fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
+        # c1.write("Most Resilient Nations")
+        c1.plotly_chart(fig1)
 
         c2.write(str.upper(i))
-        # c2.write(df[i].sort_values(ascending= True).head(10))
-        fig1,axs1 = plt.subplots(figsize=(6,4))
-        # plt.style.use(plt_style)
-        # c1.write(df[i].sort_values(ascending= False).head(10))
-        df[i].sort_values(ascending= True).head(10).plot.barh()
+
+        worst_10 = df.sort_values(i,ascending = True)[i].head(10)
+
+        fig2 = px.bar(worst_10, x = i,y = worst_10.index,orientation='h')
+
+        fig2.update_layout(xaxis_range=[0,100],yaxis_title=None, xaxis_title=None)
+        fig2.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
+        fig2.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
+
         if(visType=="Des"):
-            plt.xlim([0,100])
+            fig2.update_layout(xaxis_range=[0,100],yaxis_title=None, xaxis_title=None)
         else:
-            plt.xlim([-50,5])
-        # plt.show()
-        c2.pyplot(fig1)
+            fig2.update_layout(xaxis_range=[-100,5],yaxis_title=None, xaxis_title=None)
+        # c1.write("Most Resilient Nations")
+        c2.plotly_chart(fig2)
 
 def linePlot(df,countrySelect,c1,c2):
     df.index.name=None
