@@ -778,7 +778,7 @@ else:
     co1, co2,co3 = conPlots.columns(3)
     fig1 = go.Figure(go.Indicator(
     domain = {'x': [0, 1], 'y': [0, 1]},
-    value = 50.2,
+    value = np.round(np.random.rand(),2)*100,
     mode = "gauge+number",
     number ={'suffix': "%"},
     title = {'text': "Intervention 1"},
@@ -791,7 +791,7 @@ else:
     fig1.update_layout(width=500)
     fig2 = go.Figure(go.Indicator(
     domain = {'x': [0, 1], 'y': [0, 1]},
-    value = 40.2,
+    value = np.round(np.random.rand(),2)*100,
     mode = "gauge+number",
     number ={'suffix': "%"},
     title = {'text': "Intervention 2"},
@@ -804,7 +804,7 @@ else:
 
     fig3 = go.Figure(go.Indicator(
     domain = {'x': [0, 1], 'y': [0, 1]},
-    value = 9.5,
+    value = np.round(np.random.rand(),2)*100,
     mode = "gauge+number",
     number ={'suffix': "%"},
     title = {'text': "Intervention 3"},
