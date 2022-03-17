@@ -642,7 +642,7 @@ def doSA(effect,scale,shock,intensity,duration,c1,c2,country=None):
 
         best_10 = plot_d.sort_values("Score", ascending = False).head(10)
         fig1 = px.bar(best_10, x ="Score" , y = best_10.index,orientation='h', text = "diff")
-        fig1.update_layout(xaxis = {‘autorange’: ‘true’},yaxis_title=None)
+        fig1.update_layout(xaxis_range=[0,120],yaxis_title=None)
         fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         fig1.update_traces(textposition='outside')
@@ -651,7 +651,7 @@ def doSA(effect,scale,shock,intensity,duration,c1,c2,country=None):
 
         worst_10 = plot_d.sort_values("Score", ascending = True).head(10)
         fig2 = px.bar(worst_10, x = "Score", y = worst_10.index,orientation='h',text = "diff")
-        fig2.update_layout(xaxis = {‘autorange’: ‘true’},yaxis_title=None)
+        fig2.update_layout(xaxis_range=[0,120],yaxis_title=None)
         fig2.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig2.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         fig2.update_traces(textposition='outside')
