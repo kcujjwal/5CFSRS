@@ -78,7 +78,7 @@ all_factors1 = {
      'Diversity': 'Food Diversity Score',
 
 
-     'social': 'Social',
+     'social': 'Social Capital',
      'urbancap':'Urban Absorption Capacity',
      'safetynet': 'Presence of SafetyNet',
     'policyfood': 'Food Policy Score',
