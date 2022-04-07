@@ -1,21 +1,15 @@
-from audioop import reverse
-from email.policy import default
-from glob import glob
 from re import T
-from turtle import lt, width
 from matplotlib.axis import XAxis
 from matplotlib.colors import hexColorPattern
-from numpy.core.fromnumeric import prod
-from pandas.core.indexes import base
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 from streamlit import caching
-from validators import length
+import streamlit.components.v1 as components, html
+from google1 import main as mn
 
 
 import copy
@@ -33,6 +27,7 @@ import plotly.graph_objects as go
 # import SessionState 
 # session = SessionState.get(run_id=0)
 
+spreadsheets = ['Best Interventions']
 
 damages = {
     'Drought': [1,4,7,10,12.36,13.83,14.62,15.24,15.59,16.33],
@@ -40,10 +35,10 @@ damages = {
     'Flood':[1,5,10,12.54,14.94,15.79,16.12,16.63,17.04,17.58],
     'Landslide':[1,2.5,4,5.5,7,8.5,9.12,11.24,12.26,13.69],
     'Storm':[1,8,11.9,13.3,13.99,15.45,15.93,16.49,17.17,17.93],
-    'Volcano':[1,2,3,4,5,6,7,9.5,11.39,13.09],
+    'Volcanic Activity':[1,2,3,4,5,6,7,9.5,11.39,13.09],
     'Wildfire':[1,4,7,8.46,11.77,12.96,13.94,14.61,15.19,15.89],
-    'Economic Crises':[1,3,5,7,9,11,13,15,17,19,21],
-    'Political Conflict':[1,3,5,7,9,11,13,15,17,19,21]
+    'Economic Crises':[1,3,5,7,9,11,13,15,17,19,21]
+    # 'Political Conflict':[1,3,5,7,9,11,13,15,17,19,21]
 }
 
 
@@ -78,7 +73,7 @@ all_factors1 = {
      'Diversity': 'Food Diversity Score',
 
 
-     'social': 'Social Capital',
+     'social': 'Social',
      'urbancap':'Urban Absorption Capacity',
      'safetynet': 'Presence of SafetyNet',
     'policyfood': 'Food Policy Score',
@@ -189,6 +184,49 @@ plt_style = 'bmh'
 
 # 
 st.set_page_config(layout="wide")
+# components.html('<head> <script src="https://embed-cdn.surveyhero.com/popup/user/main.ukeampdx.js" async></script> </head>', width=200, height=200)
+
+# components.iframe(html_string)
+
+# components.html(
+#     """
+#     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+#     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+#     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+#     <div id="accordion">
+#       <div class="card">
+#         <div class="card-header" id="headingOne">
+#           <h5 class="mb-0">
+#             <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+#             Collapsible Group Item #1
+#             </button>
+#           </h5>
+#         </div>
+#         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+#           <div class="card-body">
+#             Collapsible Group Item #1 content
+#           </div>
+#         </div>
+#       </div>
+#       <div class="card">
+#         <div class="card-header" id="headingTwo">
+#           <h5 class="mb-0">
+#             <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+#             Collapsible Group Item #2
+#             </button>
+#           </h5>
+#         </div>
+#         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+#           <div class="card-body">
+#             Collapsible Group Item #2 content
+#             <script src="https://embed-cdn.surveyhero.com/popup/user/main.ukeampdx.js" async></script>
+#           </div>
+#         </div>
+#       </div>
+#     </div>
+#     """,
+#     height=600,
+# )
 st.title("Five Capitals Food System Resilience Score (5CFSRS) Analysis Tool")
 st.markdown('The 5CFSRS gives the scores for several food system resilience indicators based on the performance of the countries.')
 st.markdown('This Dashboard is the preliminary version of a diagnostic tool for rapidly scanning food stresses and shocks.')
@@ -602,47 +640,95 @@ def visualizeComp(op,c1,c2,conPlots,choiceDiff):
 
 
 
-def doSA(effect,scale,shock,intensity,duration,c1,c2,country=None):
+def doSA(scale,shock,intensity,duration,c1,c2,country=None,con=None):
     global dataColl
+    disinfo = pd.read_csv('disInfo.csv',index_col ='index')
     yearChoice = 2020
     if scale=="Global":
-        df_effect = effect[shock]
-        df1 = dataColl[yearChoice]
-        df = df1.transpose()
-        print(df)
-        data = pd.merge(df_effect,df, left_on = df_effect.index, right_on=df.index, how = "left")
-        plot_data = pd.DataFrame()
-        plot_data["Country"] = df_effect.index
-        # print(data)
-        
+        temp = pd.DataFrame(disinfo[shock])
+        print(temp.head())
+        con.write('Global Vulnerability of {}'.format(shock))
 
-        for i in df1.index:
-            plot_data[i] = data[i] - intensity*duration*data[shock]
+        best_10 = temp.sort_values(shock, ascending = False).head(10)
+        fig1 = px.bar(best_10, x =shock , y = best_10.index,orientation='h', text = shock)
+        fig1.update_layout(xaxis_range=[0,110],yaxis_title=None,xaxis_title ='Standardized Impact')
+        fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
+        fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
+        fig1.update_traces(textposition='outside')
+        # c1.write("Most Resilient Nations")
+        c1.plotly_chart(fig1)
+
+        worst_10 = temp[temp>0].sort_values(shock, ascending = True).head(10)
+        fig2 = px.bar(worst_10, x = shock, y = worst_10.index,orientation='h',text = shock)
+        fig2.update_layout(xaxis_range=[0,110],yaxis_title=None,xaxis_title ='Standardized Impact')
+        fig2.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
+        fig2.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
+        fig2.update_traces(textposition='outside')
+        # c2.write("Most Vulnerable Nations")
+        c2.plotly_chart(fig2)
+
+
+
+
+
+
+
+        effect = pd.read_csv('globalscale.csv',index_col='index')
+        df_effect = effect[shock]
+        print(df_effect.head())
+        df = dataColl[yearChoice]
+        df=df[['Score']]
+    
+        # df = df1.transpose()
+        print(df.head())
+        # print(df1.head())
+        data = pd.merge(df,df_effect, right_on = df_effect.index, left_on=df.index, how = "left")
+        print(data.head())
+        plot_data = pd.DataFrame()
+        plot_data["Country"] = df.index
+
+        plot_data["Score"] = data['Score'] - intensity*duration*data[shock]
+    
+        # plot_data[plot_data>0]=100        
+
+        # for i in df.index:
+        #     plot_data[i] = data[i] - intensity*duration*data[shock]
         plot_data =plot_data.set_index("Country")
         plot_data[plot_data<0]=0
+        plot_data[plot_data>100]=100
+ 
+
+        # # for i in df1.index:
+        # #     plot_data[i] = data[i] - intensity*duration*data[shock]
+        # # plot_data =plot_data.set_index("Country")
+        # # plot_data[plot_data<0]=0
         
-        plot_d = plot_data.T
-        print(plot_d)
-        plot_d['natural'] = plot_d[natural].mean(axis =1)
-        plot_d['human'] = plot_d[human].mean(axis =1)
-        plot_d['social'] = plot_d[social].mean(axis =1)
-        plot_d['financial'] = plot_d[financial].mean(axis =1)
-        plot_d['manufactured'] = plot_d[manufactured].mean(axis =1)
-        plot_d['Score'] = np.round(plot_d[['natural','human','social', 'financial','manufactured']].mean(axis =1),1)
+        print(plot_data.head())
+
+        # plot_d = plot_data.T
         # print(plot_d)
-        # df['Score'] = np.round(df.mean(axis=1),1)
-        # print('printing df after score')
-        # print(df1)
+        # plot_d['natural'] = plot_d[natural].mean(axis =1)
+        # plot_d['human'] = plot_d[human].mean(axis =1)
+        # plot_d['social'] = plot_d[social].mean(axis =1)
+        # plot_d['financial'] = plot_d[financial].mean(axis =1)
+        # plot_d['manufactured'] = plot_d[manufactured].mean(axis =1)
+        # plot_d['Score'] = np.round(plot_d[['natural','human','social', 'financial','manufactured']].mean(axis =1),1)
+        # # print(plot_d)
+        # # df['Score'] = np.round(df.mean(axis=1),1)
+        # # print('printing df after score')
+        # # print(df1)
 
-        plot_d['diff'] = np.round(plot_d['Score']-df1['Score'],1)
+        plot_d = plot_data.copy()
 
-        print(plot_d)
+        plot_d['diff'] = np.round(plot_data['Score']-df['Score'],1)
 
-        
+        # print(plot_d)
+
+        # plot_d[plot_d>100]=100
 
         best_10 = plot_d.sort_values("Score", ascending = False).head(10)
         fig1 = px.bar(best_10, x ="Score" , y = best_10.index,orientation='h', text = "diff")
-        fig1.update_layout(xaxis_range=[0,120],yaxis_title=None)
+        fig1.update_layout(xaxis_range=[0,110],yaxis_title=None)
         fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         fig1.update_traces(textposition='outside')
@@ -651,43 +737,71 @@ def doSA(effect,scale,shock,intensity,duration,c1,c2,country=None):
 
         worst_10 = plot_d.sort_values("Score", ascending = True).head(10)
         fig2 = px.bar(worst_10, x = "Score", y = worst_10.index,orientation='h',text = "diff")
-        fig2.update_layout(xaxis_range=[0,120],yaxis_title=None)
+        fig2.update_layout(xaxis_range=[0,110],yaxis_title=None)
         fig2.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig2.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         fig2.update_traces(textposition='outside')
         c2.write("Most Vulnerable Nations")
         c2.plotly_chart(fig2)
-    elif(scale=="Country"):
-        df_effect1 = effect[shock]
 
-        df_effect = df_effect1[df_effect1>0]
-        # df_effect = df_effect1[df_effect1>0].sort_values(shock, ascending= False)
+
+    elif(scale=="Country"):
+        effect = pd.read_csv('Country/{}.csv'.format(country),index_col='index')
+        
+        try:
+            disdata = disinfo[disinfo.index==country].transpose().reset_index()
+            print(disdata.head())
+            # con.write("Historical Impact Analysis of Shocks")
+            fig3 = px.bar(disdata.sort_values(by=country,ascending=False), y =country , x = 'index',orientation='v',text = country)
+            fig3.update_layout(yaxis_range=[0,max(disdata[country])+3],yaxis_title='Standardized Impact Score',xaxis_title=None, font = dict(
+                size =18,
+            )
+            )
+            fig3.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
+            fig3.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
+            fig3.update_traces(textposition='outside')
+            con.plotly_chart(fig3)
+        except:
+            con.write("No food shocks reported in {}".format(country))
+
+
         
 
 
+
+
+        df_effect1 = effect[shock]
+        print(df_effect1.head())
+
+        # df_effect = df_effect1[df_effect1>0]
+        # df_effect = df_effect1[df_effect1>0].sort_values(shock, ascending= False)
+        
+        df_effect = df_effect1.copy()
+
         df1 = dataColl[yearChoice]
+        print(df1.head())
 
         print("prinding ddf1")
 
         df = df1[df1.index==country].transpose()
-        print(df.transpose().index)
+        # print(df.transpose().index)
     
         data = pd.merge(df_effect,df, left_on = df_effect.index, right_on=df.index, how = "left")
-        print(data)
+        # print(data)
         plot_data = pd.DataFrame()
         plot_data["Indicator"] = df_effect.index
-        print(plot_data)
+        # print(plot_data)
 
         
 
         for i in df.transpose().index:
             plot_data[i] = data[i] - intensity*duration*data[shock]
         plot_data =plot_data.set_index("Indicator")
-        # plot_data[plot_data<0]=0
+        plot_data[plot_data>100]=100
 
         plot_d = plot_data
         plot_d["var_name"] = [all_factors1[i] for i in plot_d.index]
-        print(plot_d)
+        # print(plot_d)
         # print(plot_data.sort_values(country, ascending=False))
         # plot_d['natural'] = plot_d[natural].mean(axis =1)
         # plot_d['human'] = plot_d[human].mean(axis =1)
@@ -697,10 +811,11 @@ def doSA(effect,scale,shock,intensity,duration,c1,c2,country=None):
         # plot_d['Score'] = np.round(plot_d[['natural','human','social', 'financial','manufactured']].mean(axis =1),1)
         # print(plot_d)
         plot_d['diff'] = np.round(plot_d[country]-df[country],1)
+        
         best_10 = plot_d[plot_d[country]>0].sort_values(country, ascending = False).head(10)
         # fig1 = px.bar(best_10, x =country , y = best_10.index,orientation='h')
         fig1 = px.bar(best_10, x =country , y = "var_name",orientation='h',text = "diff")
-        fig1.update_layout(xaxis_range=[0,100],yaxis_title=None)
+        fig1.update_layout(xaxis_range=[0,120],yaxis_title=None)
         fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         fig1.update_traces(textposition='outside')
@@ -711,7 +826,7 @@ def doSA(effect,scale,shock,intensity,duration,c1,c2,country=None):
         worst_10 = plot_d[plot_d[country]>0].sort_values(country, ascending = True).head(10)
         # fig2 = px.bar(worst_10, x = country, y = worst_10.index,orientation='h')
         fig2 = px.bar(worst_10, x = country, y = "var_name",orientation='h',text = "diff")
-        fig2.update_layout(xaxis_range=[0,100],yaxis_title=None)
+        fig2.update_layout(xaxis_range=[0,120],yaxis_title=None)
         fig2.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig2.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         fig2.update_traces(textposition='outside')
@@ -745,6 +860,75 @@ def doSA(effect,scale,shock,intensity,duration,c1,c2,country=None):
     
     else:
         print("nth")
+
+
+def displayGuage(temp_df,conPlots):
+
+    print(temp_df['Food System Shock'],shock)
+    
+    data1 = temp_df[temp_df['Food System Shock']==shock].dropna(axis=1).drop(columns = ["Timestamp","Email Address","Food System Shock", "Impact Intensity"]).reset_index(drop=True)
+    # temp = data1.transpose()
+    print(data1.transpose(),data1.transpose().columns)
+    
+    trans_df = data1.transpose()
+    trans_df.info()
+    trans_df['Avg'] = trans_df.mean(axis=1)
+    best_int = trans_df.sort_values(by = "Avg", ascending = False).head(3)
+    names = list(best_int.index)
+    values = list(best_int["Avg"])
+    # trans_df =trans_df.rename(columns = )
+    print(best_int)
+    print(best_int.index)
+
+    co1, co2,co3 = conPlots.columns(3)
+    fig1 = go.Figure(go.Indicator(
+    domain = {'x': [0, 1], 'y': [0, 1]},
+    value = values[0],
+    mode = "gauge+number",
+    # number ={'suffix': "%"},
+    title = {'text': names[0]},
+# delta = {'reference': 380},
+    gauge = {'axis': {'range': [None, 10]},
+            'steps' : [
+                {'range': [0, 3], 'color': "lightgray"},
+                {'range': [3, 6], 'color': "gray"}],
+            'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.8, 'value': 100}}))
+
+    fig1.update_layout(width=500)
+    fig2 = go.Figure(go.Indicator(
+    domain = {'x': [0, 1], 'y': [0, 1]},
+    value =values[1],
+    mode = "gauge+number",
+    # number ={'suffix': "%"},
+    title = {'text': names[1]},
+# delta = {'reference': 380},
+    gauge = {'axis': {'range': [None, 10]},
+            'steps' : [
+                {'range': [0, 3], 'color': "lightgray"},
+                {'range': [3, 6], 'color': "gray"}],
+            'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.8, 'value': 100}}))    
+
+    fig3 = go.Figure(go.Indicator(
+    domain = {'x': [0, 1], 'y': [0, 1]},
+    value = values[2],
+    mode = "gauge+number",
+    # number ={'suffix': "%"},
+    title = {'text': names[2]},
+# delta = {'reference': 380},
+    gauge = {'axis': {'range': [None, 10]},
+            'steps' : [
+                {'range': [0, 3], 'color': "lightgray"},
+                {'range': [3, 6], 'color': "gray"}],
+            'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.8, 'value': 100}}))  
+
+
+    fig1.update_layout(width=500) 
+    fig2.update_layout(width=500)  
+    fig3.update_layout(width=500) 
+    co1.plotly_chart(fig1)
+    co2.plotly_chart(fig2)
+    co3.plotly_chart(fig3)
+
 
 
 
@@ -808,75 +992,126 @@ elif(analysisType=="Comparative Analysis"):
 
 
 elif((analysisType=="Scenario Analysis")):
-    effect = pd.read_csv('effect1.csv', index_col = "Variables")
+    # effect = pd.read_csv('effect1.csv', index_col = "Variables")
+    # effect = {}
     scale = st.sidebar.selectbox('Select a scale',["Global","Country"])
     country=None
     if (scale=="Country"):
         country = st.sidebar.selectbox('Select a country',countries)
         conPlots.write(country)
     shock = st.sidebar.selectbox('Select a shock',damages.keys())
-    print(shock)
-    hazard_score = damages[shock]
-    damageamount = float(st.sidebar.text_input('Please enter possible damages in US $ in millions', value = 0))
+    intensity_score = st.sidebar.slider('Enter the shock intensity', min_value=0,max_value=10,value=0)
+    # print(shock)
+    # hazard_score = damages[shock]
+    # damageamount = float(st.sidebar.text_input('Please enter possible damages in US $ in millions', value = 0))
     
-    intensity_score = min(max(int(min(hazard_score, key=lambda x:abs(x-damageamount**0.1)))-1,1),10)
-    st.sidebar.text('Estimated Impact Intensity is: '+str(intensity_score))
+    # intensity_score = min(max(int(min(hazard_score, key=lambda x:abs(x-damageamount**0.1)))-1,1),10)
+    # st.sidebar.text('Estimated Impact Intensity is: '+str(intensity_score))
     # intensity = st.sidebar.slider('Intensity of Shock', min_value = 0, max_value = 10,value = 0)
     # duration = st.sidebar.slider('Duration of Shock', min_value = 1, max_value = 10,value = 0)
     
-    doSA(effect,scale,shock,intensity_score,1,c1,c2,country)
+    doSA(scale,shock,intensity_score,1,c1,c2,country,con=conPlots)
     # st.markdown("# _Page will be up and running soon.... Hang on!!!_")
 
 else:
     # st.markdown("# _Page will be up and running soon.... Hang on!!!_")
-    shock = st.sidebar.selectbox('Select a shock',["Flood","Drought", "Storm", "Pandemic", "Civil War", "Economic Crisis","Earthquake"])
+    mn(spreadsheets)
+    temp_df = pd.read_csv('survey_data.csv')
+    # print(temp_df)
+    user = st.sidebar.selectbox('Select User Type',["Expert","User"])
+    shock = st.sidebar.selectbox('Select a shock',damages.keys())
     intensity = st.sidebar.slider('Intensity of Shock', min_value = 0, max_value = 10,value = 0)
-    duration = st.sidebar.slider('Duration of Shock in days', min_value = 1, max_value = 120,value = 0)
-    co1, co2,co3 = conPlots.columns(3)
-    fig1 = go.Figure(go.Indicator(
-    domain = {'x': [0, 1], 'y': [0, 1]},
-    value = np.round(np.random.rand(),2)*100,
-    mode = "gauge+number",
-    number ={'suffix': "%"},
-    title = {'text': "Intervention 1"},
-   # delta = {'reference': 380},
-    gauge = {'axis': {'range': [None, 100]},
-             'steps' : [
-                 {'range': [0, 25], 'color': "lightgray"},
-                 {'range': [25, 50], 'color': "gray"}],
-             'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.8, 'value': 100}}))
-    fig1.update_layout(width=500)
-    fig2 = go.Figure(go.Indicator(
-    domain = {'x': [0, 1], 'y': [0, 1]},
-    value =np.round(np.random.rand(),2)*100,
-    mode = "gauge+number",
-    number ={'suffix': "%"},
-    title = {'text': "Intervention 2"},
-   # delta = {'reference': 380},
-    gauge = {'axis': {'range': [None, 100]},
-             'steps' : [
-                 {'range': [0, 25], 'color': "lightgray"},
-                 {'range': [25, 50], 'color': "gray"}],
-             'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.8, 'value': 100}}))    
+    # duration = st.sidebar.slider('Duration of Shock in days', min_value = 1, max_value = 120,value = 0)
+#     co1, co2,co3 = conPlots.columns(3)
+#     fig1 = go.Figure(go.Indicator(
+#     domain = {'x': [0, 1], 'y': [0, 1]},
+#     value = np.round(np.random.rand(),2)*100,
+#     mode = "gauge+number",
+#     number ={'suffix': "%"},
+#     title = {'text': "Intervention 1"},
+#    # delta = {'reference': 380},
+#     gauge = {'axis': {'range': [None, 100]},
+#              'steps' : [
+#                  {'range': [0, 25], 'color': "lightgray"},
+#                  {'range': [25, 50], 'color': "gray"}],
+#              'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.8, 'value': 100}}))
 
-    fig3 = go.Figure(go.Indicator(
-    domain = {'x': [0, 1], 'y': [0, 1]},
-    value = np.round(np.random.rand(),2)*100,
-    mode = "gauge+number",
-    number ={'suffix': "%"},
-    title = {'text': "Intervention 3"},
-   # delta = {'reference': 380},
-    gauge = {'axis': {'range': [None, 100]},
-             'steps' : [
-                 {'range': [0, 25], 'color': "lightgray"},
-                 {'range': [25, 50], 'color': "gray"}],
-             'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.8, 'value': 100}}))   
-    fig1.update_layout(width=500) 
-    fig2.update_layout(width=500)  
-    fig3.update_layout(width=500) 
-    co1.plotly_chart(fig1)
-    co2.plotly_chart(fig2)
-    co3.plotly_chart(fig3)
+
+    # components.html('''
+    # <div id="medium-widget"></div>
+    # <script src="https://medium-widget.pixelpoint.io/widget.js"></script>
+    # <script>MediumWidget.Init({renderTo: '#medium-widget', params: {"resource":"https://medium.com/@mehulgupta_7991","postsPerLine":3,"limit":9,"picture":"small","fields":["description","author","claps","publishAt"],"ratio":"landscape"}})</script>''')
+
+    my_html = """
+    <a href="https://forms.gle/W8XkFaq28DinvvWU7" target="_blank">Click here to enter your expert opinion</a>
+    """
+    
+    if user=="Expert":
+        components.html(my_html)
+        conPlots.write("_Please enter Food System Shock as_ **{}** _and Intensity of Shock as_ **{}** _while filling up the form!_".format(shock,intensity))
+
+        done =conPlots.checkbox("Check this box when done with putting your expert opinion / Uncheck the box if you want to enter additional information!")
+
+        if done:
+            # conPlots.empty()
+            mn(spreadsheets)
+            temp_df = pd.read_csv('survey_data.csv')
+            displayGuage(temp_df,conPlots)
+
+
+            done=False
+
+
+
+
+
+    else:
+        displayGuage(temp_df,conPlots)
+
+
+    #     fig1.update_layout(width=500)
+    #     fig2 = go.Figure(go.Indicator(
+    #     domain = {'x': [0, 1], 'y': [0, 1]},
+    #     value =np.round(np.random.rand(),2)*100,
+    #     mode = "gauge+number",
+    #     number ={'suffix': "%"},
+    #     title = {'text': "Intervention 2"},
+    # # delta = {'reference': 380},
+    #     gauge = {'axis': {'range': [None, 100]},
+    #             'steps' : [
+    #                 {'range': [0, 25], 'color': "lightgray"},
+    #                 {'range': [25, 50], 'color': "gray"}],
+    #             'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.8, 'value': 100}}))    
+
+    #     fig3 = go.Figure(go.Indicator(
+    #     domain = {'x': [0, 1], 'y': [0, 1]},
+    #     value = np.round(np.random.rand(),2)*100,
+    #     mode = "gauge+number",
+    #     number ={'suffix': "%"},
+    #     title = {'text': "Intervention 3"},
+    # # delta = {'reference': 380},
+    #     gauge = {'axis': {'range': [None, 100]},
+    #             'steps' : [
+    #                 {'range': [0, 25], 'color': "lightgray"},
+    #                 {'range': [25, 50], 'color': "gray"}],
+    #             'threshold' : {'line': {'color': "red", 'width': 4}, 'thickness': 0.8, 'value': 100}}))   
+    #     fig1.update_layout(width=500) 
+    #     fig2.update_layout(width=500)  
+    #     fig3.update_layout(width=500) 
+    #     co1.plotly_chart(fig1)
+    #     co2.plotly_chart(fig2)
+    #     co3.plotly_chart(fig3)
+
+        # conPlots.write(data1)
+
+
+
+
+    # html_string = 'src="https://embed-cdn.surveyhero.com/popup/user/main.ukeampdx.js" async'
+
+    # my_html = f"<script>{my_js}</script>"
+
+    
 
 
 
