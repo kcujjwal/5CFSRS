@@ -19,3 +19,4 @@ tk
 gspread==3.6.0
 oauth2client==4.1.3
 altair==4.1.0
+click<=8.0.4
