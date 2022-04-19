@@ -66,7 +66,7 @@ all_factors1 = {
      'agprod':'Agricultural Production Index',
      'agVol':'Agricultural Production Volatility',
     'obesity':'Obsesity Prevelance',
-    'foodsafe': 'Food Safetly',
+    'foodsafe': 'Food Safety',
      'drinking':'Drinking Water',
      'Micro': 'Micronutrient Availability',
      'Protein': 'Protein Quality',
