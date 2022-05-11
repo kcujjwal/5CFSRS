@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from streamlit import caching
 import streamlit.components.v1 as components, html
 from google1 import main as mn
+import plotly.express as px
 
 
 import copy
@@ -19,7 +20,7 @@ import seaborn as sns
 import geopandas
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-import plotly.express as px
+# import plotly.express as px
 from PIL import Image
 import plotly.graph_objects as go
 
@@ -66,7 +67,7 @@ all_factors1 = {
      'agprod':'Agricultural Production Index',
      'agVol':'Agricultural Production Volatility',
     'obesity':'Obsesity Prevelance',
-    'foodsafe': 'Food Safety',
+    'foodsafe': 'Food Safetly',
      'drinking':'Drinking Water',
      'Micro': 'Micronutrient Availability',
      'Protein': 'Protein Quality',
@@ -241,6 +242,7 @@ def load_data(data_url):
 
 DATA_URL = r"C:\Users\kc003\OneDrive - CSIRO\Projects\Composite Score\masterDataset\Yearwisedata"
 
+alldata = pd.read_csv("LL1.csv")
 
 years = range(2012,2021)
 dataColl = {}
@@ -477,6 +479,7 @@ def visualizeMap(c1,c2,conPlots):
      indicator1 = st.sidebar.selectbox('Indicator',all_factors.keys())
      indicator = all_factors[indicator1]
      df = dataColl[yearChoice][indicator]
+     print(df.head())
      df.index = df.index.str.lower()
      
      world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
@@ -514,6 +517,125 @@ def visualizeMap(c1,c2,conPlots):
     #  fig.colorbar.lim(0,100)
      conPlots.plotly_chart(fig)
 
+
+def visualizeMap1(c1,c2,conPlots):
+    #  global dataColl
+    #  df = pd.DataFrame()
+    #  j=0
+    #  for i in range(2012,2021):
+    #      if j==0:
+    #          df = copy.copy(dataColl[i])
+    #          j=1
+    #      else:
+    #          df = pd.concat([df,dataColl[i]],ignore_index=False)
+     global alldata
+     df = alldata.copy()
+     print(df.head())
+    #  yearChoice =  st.sidebar.selectbox('Year',sorted(list(years),reverse=True))
+     indicator1 = st.sidebar.selectbox('Indicator',all_factors.keys())
+     indicator = all_factors[indicator1]
+     df = df[["Year","Country",indicator]]
+     print(df.columns)
+     
+    #  df.index = df.index.str.lower()
+     df["Country"]=df["Country"].str.lower()
+     df["Year"] = df["Year"].astype("int")
+     print(df.head())
+     
+     world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
+     world = world[(world.pop_est>0) & (world.name!="Antarctica")] 
+     world['name'] = world['name'].str.lower()  
+     merged = pd.merge(left = world, right = df, right_on = "Country", left_on = 'name', how = 'left').drop(["pop_est","continent","iso_a3","gdp_md_est"],1)
+     print(merged)
+     conPlots.write(str.upper(indicator1))
+    #  conPlots.write(merged) 
+    #  fig, ax = plt.subplots(figsize=(5,2.5))
+    # #  ax.legend(fontsize=5,prop={'size': 2})
+     gdf = geopandas.GeoDataFrame(merged, geometry="geometry").dropna()
+     gdf.index = gdf.name
+     gdf["Year"]=gdf["Year"].astype("int")
+    # #  divider = make_axes_locatable(ax)
+    # #  cax = divider.append_axes("right", size="5%", pad=0.1)
+    #  gdf.plot(column=indicator, ax=ax, colormap='BuPu',vmin =0, vmax = 100,legend=True,legend_kwds={
+    #                     'orientation': "horizontal",'shrink': 0.6, 'aspect':15},edgecolor='black',missing_kwds={
+    #     "color": "lightgrey",
+    #     "edgecolor": "black",
+    #     # "hatch": "///",
+    #     "label": "Missing values",
+    #  })
+    
+    #  ax.axis('off')
+
+     fig = px.choropleth(gdf, geojson=gdf.geometry, locations=gdf.index, color=indicator, width = 1200,color_continuous_scale="plasma",range_color=(0, 100),
+     hover_name=gdf.index,animation_frame="Year")
+     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+     fig.update_geos(fitbounds="locations", visible=False)
+     fig.update_traces(marker_line_width=2)
+    #  cb_ax = fig.axes[1] 
+    #  cb_ax.tick_params(labelsize=5)
+
+
+    #  fig.colorbar.lim(0,100)
+     conPlots.plotly_chart(fig)
+
+
+def visualizeMapan(c1,c2,conPlots):
+    df = pd.read_csv('alldisaster.csv')
+    print(df.head())
+    fd = df.groupby(["Year","Country"])["AdjustedDamages_new"].sum().reset_index()
+    print(fd.head())
+
+    fig = px.choropleth(fd, locations="Country", color="AdjustedDamages_new", width = 1200,color_continuous_scale="viridis",range_color=(0, 100),
+                     hover_name="Country",
+                     animation_frame="Year",
+                     projection="equirectangular")
+    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0},)
+    fig.update_yaxes(visible=False)
+    # fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_traces(marker_line_width=2)
+    
+    conPlots.plotly_chart(fig)
+    #  global dataColl  
+    #  yearChoice =  st.sidebar.selectbox('Year',sorted(list(years),reverse=True))
+    #  indicator1 = st.sidebar.selectbox('Indicator',all_factors.keys())
+    #  indicator = all_factors[indicator1]
+    #  df = dataColl[yearChoice][indicator]
+    #  df.index = df.index.str.lower()
+     
+    #  world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
+    #  world = world[(world.pop_est>0) & (world.name!="Antarctica")] 
+    #  world['name'] = world['name'].str.lower()  
+    #  merged = pd.merge(left = world, right = df, right_on = df.index, left_on = 'name', how = 'left').drop(["pop_est","continent","iso_a3","gdp_md_est"],1)
+    #  print(merged)
+    #  conPlots.write(str.upper(indicator1))
+    # #  conPlots.write(merged) 
+    # #  fig, ax = plt.subplots(figsize=(5,2.5))
+    # # #  ax.legend(fontsize=5,prop={'size': 2})
+    #  gdf = geopandas.GeoDataFrame(merged, geometry="geometry")
+    #  gdf.index = gdf.name
+    # # #  divider = make_axes_locatable(ax)
+    # # #  cax = divider.append_axes("right", size="5%", pad=0.1)
+    # #  gdf.plot(column=indicator, ax=ax, colormap='BuPu',vmin =0, vmax = 100,legend=True,legend_kwds={
+    # #                     'orientation': "horizontal",'shrink': 0.6, 'aspect':15},edgecolor='black',missing_kwds={
+    # #     "color": "lightgrey",
+    # #     "edgecolor": "black",
+    # #     # "hatch": "///",
+    # #     "label": "Missing values",
+    # #  })
+    
+    # #  ax.axis('off')
+
+    #  fig = px.choropleth(gdf, geojson=gdf.geometry, locations=gdf.index, color=indicator, width = 1200,color_continuous_scale="viridis",range_color=(0, 100),
+    #  hover_name=gdf.index)
+    #  fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    #  fig.update_geos(fitbounds="locations", visible=False)
+    #  fig.update_traces(marker_line_width=2)
+    # #  cb_ax = fig.axes[1] 
+    # #  cb_ax.tick_params(labelsize=5)
+
+
+    # #  fig.colorbar.lim(0,100)
+    #  conPlots.plotly_chart(fig)
 
 
 
@@ -961,7 +1083,8 @@ conSliders = st.container()
 c1,c2 = conSliders.columns(2)
 
 if(analysisType=="World Map"):
-    visualizeMap(c1,c2,conPlots)    
+    # visualizeMap(c1,c2,conPlots)    
+    visualizeMap1(c1,c2,conPlots)
 
 
 
