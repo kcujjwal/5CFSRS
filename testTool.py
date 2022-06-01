@@ -65,7 +65,7 @@ all_factors1 = {
      'Diversity': 'Food Diversity Score',
 
 
-     'social': 'Social',
+     'social': 'Social Capital',
      'urbancap':'Urban Absorption Capacity',
      'safetynet': 'Presence of SafetyNet',
     'policyfood': 'Food Policy Score',
@@ -224,9 +224,9 @@ def showPlot(df,c1,c2,index = "country",visType="Des",check="nice"):
     for i in df.columns:
         # print(i)
         if i in all_factors1.keys():
-            c1.write(str.upper(all_factors1[i]))
+            c1.subheader(str.upper(all_factors1[i]))
         else:
-            c1.write(str.upper(i))
+            c1.subheader(str.upper(i))
 
 
         print(df.head())
@@ -250,12 +250,14 @@ def showPlot(df,c1,c2,index = "country",visType="Des",check="nice"):
         fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         # c1.write("Most Resilient Nations")
+        # c1.markdown('__STRENGTHS__')
+    
         c1.plotly_chart(fig1)
 
         if i in all_factors1.keys():
-            c2.write(str.upper(all_factors1[i]))
+            c2.subheader(str.upper(all_factors1[i]))
         else:
-            c2.write(str.upper(i))
+            c2.subheader(str.upper(i))
 
         worst_10 = df.sort_values(i,ascending = True).head(10)
         print(worst_10)
@@ -272,6 +274,7 @@ def showPlot(df,c1,c2,index = "country",visType="Des",check="nice"):
         else:
             fig2.update_layout(xaxis_range=[-100,5],yaxis_title=None, xaxis_title=None)
         # c1.write("Most Resilient Nations")
+        # c2.markdown('__WEAKNESSES__')
         c2.plotly_chart(fig2)
             
         
@@ -290,7 +293,7 @@ def linePlot(df,countrySelect,c1,c2):
 
             if(df.columns[2*i] in all_factors1.keys()):
         
-                c1.write(str.upper(all_factors1[df.columns[2*i]]))
+                c1.subheader(str.upper(all_factors1[df.columns[2*i]]))
 
 
             fig,axs = plt.subplots(figsize=(6,4))
@@ -303,7 +306,7 @@ def linePlot(df,countrySelect,c1,c2):
             c1.pyplot(fig)
 
             # c2.write(str.upper(df.columns[2*i+1]))
-            c2.write(str.upper(all_factors1[df.columns[2*i+1]]))
+            c2.subheader(str.upper(all_factors1[df.columns[2*i+1]]))
             # c2.write(df[i].sort_values(ascending= True).head(10))
             fig1,axs1 = plt.subplots(figsize=(6,4))
             plt.style.use(plt_style)
@@ -332,7 +335,7 @@ def linePlot1(df,countrySelect,conPlots,capital):
         for i in countrySelect:
             df1=df[df.index==i]
             print(df1)
-            conPlots.write(str.upper(i))
+            conPlots.subheader(str.upper(i))
         
 
 
@@ -461,8 +464,8 @@ def visualizeOp(op,c1,c2,yearChoice=2020):
         #     for i in yearChoice:
         #         dataColl[i] = pd.read_csv(DATA_URL + "\\"+str(i)+'.csv',index_col= 'Country')
 
-    c1.markdown('__STRENGTHS__')
-    c2.markdown('__WEAKNESSES__')
+    # c1.markdown('__STRENGTHS__')
+    # c2.markdown('__WEAKNESSES__')
     if op=="Country":
         countrySelect = st.sidebar.multiselect('Select Country(ies)',countries)
         print("choice of year = " + str(yearChoice))
@@ -735,8 +738,10 @@ def doSA(scale,shock,intensity,duration,c1,c2,country=None,con=None):
     else:
         print("nth")
 
-def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
+def doSA1(dff,scale,shock,intensity,duration,conPlots,c1,c2,country=None):
     # print(df.head(10))
+    # conPlots = st.container()
+    # c1,c2 = conPlots.columns(2)
     temp = dff.copy()
     temp['intensity'] = temp['intensity'].apply(np.round)
     print(temp.head())
@@ -751,7 +756,8 @@ def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
         temp[shock] = temp[shock].astype("float").apply(np.round)
         # temp = pd.DataFrame(disinfo[shock])
         # print(temp.head())
-        con.write('Global Vulnerability of {}'.format(shock))
+        with conPlots:
+            st.subheader('Global Vulnerability of {}'.format(shock))
 
         best_10 = temp.sort_values(shock, ascending = False).head(10)
         print(best_10)
@@ -760,7 +766,7 @@ def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
         fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         fig1.update_traces(textposition='outside')
-        # c1.write("Most Resilient Nations")
+        c1.subheader("Most Affected Nations")
         c1.plotly_chart(fig1)
 
         worst_10 = temp[temp[shock]>0].sort_values(shock, ascending = True).head(10)
@@ -769,7 +775,7 @@ def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
         fig2.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig2.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         fig2.update_traces(textposition='outside')
-        # c2.write("Most Vulnerable Nations")
+        c2.subheader("Least Affected Nations")
         c2.plotly_chart(fig2)
 
 
@@ -826,7 +832,7 @@ def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
         fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         fig1.update_traces(textposition='outside')
-        c1.write("Most Resilient Nations")
+        c1.subheader("Most Resilient Nations")
         c1.plotly_chart(fig1)
 
         worst_10 = plot_d.sort_values("Score", ascending = True).head(10)
@@ -835,7 +841,7 @@ def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
         fig2.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig2.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
         fig2.update_traces(textposition='outside')
-        c2.write("Most Vulnerable Nations")
+        c2.subheader("Most Vulnerable Nations")
         c2.plotly_chart(fig2)
 
 
@@ -856,15 +862,20 @@ def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
             fig3.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
             fig3.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
             fig3.update_traces(textposition='outside')
+            conPlots.subheader("Impacts of Food Shocks")
             conPlots.plotly_chart(fig3)
          
 
         except:
-            con.write("No food shocks reported in {}".format(country))
+            conPlots.write("No food shocks reported in {}".format(country))
 
 
     
         print("trying")
+        print(disdata.loc[disdata["Disaster Type"]==shock,"intensity"])
+        # if (disdata.loc[disdata["Disaster Type"]==shock,"intensity"]==0):
+        if (disdata[disdata["Disaster Type"]==shock]["intensity"].sum()==0):
+            conPlots.markdown("Note: No {} reported in {}, Indicators unlikely to change so far!!!".format(shock,country))
         df_effect1 = effect[shock]
         print(df_effect1.head())
 
@@ -920,7 +931,7 @@ def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
             fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
             fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
             fig1.update_traces(textposition='outside')
-            c1.write("Most Resilient Indicators")
+            c1.subheader("Most Resilient Indicators")
             # c1.write(country)
             c1.plotly_chart(fig1)
 
@@ -931,7 +942,7 @@ def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
             fig2.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
             fig2.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
             fig2.update_traces(textposition='outside')
-            c2.write("Most Vulnerable Indicators")
+            c2.subheader("Most Vulnerable Indicators")
             # c2.write(country)
             c2.plotly_chart(fig2)
         
@@ -953,7 +964,7 @@ def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
             fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
             fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
             fig1.update_traces(textposition='outside')
-            c1.write("Most Resilient Indicators")
+            c1.subheader("Most Resilient Indicators")
             # c1.write(country)
             c1.plotly_chart(fig1)
 
@@ -964,7 +975,7 @@ def doSA1(dff,scale,shock,intensity,duration,c1,c2,country=None,con=None):
             fig2.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
             fig2.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
             fig2.update_traces(textposition='outside')
-            c2.write("Most Vulnerable Indicators")
+            c2.subheader("Most Vulnerable Indicators")
             # c2.write(country)
             c2.plotly_chart(fig2)
         
@@ -1064,6 +1075,9 @@ analysisType = st.sidebar.radio(
 countries = org_data.index
 
 conPlots = st.container()
+
+
+c1,c2 = st.columns(2)
 # col1, col2 = conPlots.columns((0.85,1))
 
 # conSliders = st.container()
@@ -1071,7 +1085,11 @@ conPlots = st.container()
 # global c1,c2
 
 # c1,c2 = conSliders.columns(2)
-c1,c2 = conPlots.columns(2)
+# c1,c2 = conPlots.columns(2)
+
+world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
+world = world[(world.pop_est>0) & (world.name!="Antarctica")].drop(columns =["pop_est","continent","iso_a3","gdp_md_est"])
+world['name'] = world['name'].str.lower() 
 
 if(analysisType=="World Map"):
     df = alldata.copy()
@@ -1082,16 +1100,16 @@ if(analysisType=="World Map"):
 
     df["Country"]=df["Country"].str.lower()
     df["Year"] = df["Year"].astype("int")
-    world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
-    world = world[(world.pop_est>0) & (world.name!="Antarctica")] 
-    world['name'] = world['name'].str.lower()  
-    merged = pd.merge(left = world, right = df, right_on = "Country", left_on = 'name', how = 'left').drop(columns =["pop_est","continent","iso_a3","gdp_md_est"])
-
+    # world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
+    # world = world[(world.pop_est>0) & (world.name!="Antarctica")] 
+    # world['name'] = world['name'].str.lower()  
+    # merged = pd.merge(left = world, right = df, right_on = "Country", left_on = 'name', how = 'left').drop(columns =["pop_est","continent","iso_a3","gdp_md_est"])
+    merged = pd.merge(left = world, right = df, right_on = "Country", left_on = 'name', how = 'left')
 
     gdf = geopandas.GeoDataFrame(merged, geometry="geometry").dropna()
     gdf.index = gdf.name
     gdf["Year"]=gdf["Year"].astype("int")
-    conPlots.write(str.upper(indicator1))
+    conPlots.subheader(str.upper(indicator1))
     visualizeMap1(gdf,conPlots)
 
 
@@ -1153,7 +1171,7 @@ elif((analysisType=="Scenario Analysis")):
     fd = fd.assign(intensity=lambda x: x[['Total Deaths_new','Total Affected_new','AdjustedDamages_new']].mean(axis=1)).reset_index()
     fd = fd[["Country","Disaster Type","intensity"]]
    
-    doSA1(fd,scale,shock,intensity_score,1,c1,c2,country,con=conPlots)
+    doSA1(fd,scale,shock,intensity_score,1,conPlots,c1,c2,country=country)
     # st.markdown("# _Page will be up and running soon.... Hang on!!!_")
 
 else:
@@ -1193,6 +1211,7 @@ else:
 
 
     else:
+        conPlots.subheader("Top 3 Interventions")
         displayGuage(temp_df,conPlots)
 
 
