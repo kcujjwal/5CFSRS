@@ -223,7 +223,6 @@ def showPlot(df,c1,c2,index = "country",visType="Des",check="nice"):
     plt.style.use(plt_style)
     for i in df.columns:
         # print(i)
-        if i in all_factors1.keys():
             c1.write(str.upper(all_factors1[i]))
         else:
             c1.write(str.upper(i))
@@ -366,7 +365,7 @@ def visualizeMap(c1,c2,conPlots):
      world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
      world = world[(world.pop_est>0) & (world.name!="Antarctica")] 
      world['name'] = world['name'].str.lower()  
-     merged = pd.merge(left = world, right = df, right_on = df.index, left_on = 'name', how = 'left').drop(["pop_est","continent","iso_a3","gdp_md_est"],1)
+     merged = pd.merge(left = world, right = df, right_on = df.index, left_on = 'name', how = 'left').drop(columns =["pop_est","continent","iso_a3","gdp_md_est"])
      print(merged)
      conPlots.write(str.upper(indicator1))
 
