@@ -1242,4 +1242,9 @@ my_html1 = """<h2>Please share your experience of using this tool
 expander = st.expander("FAQ")
 expander.write("Here you could put in some really, really long explanations...")
 components.html(my_html1)
+a,b,c = st.columns(3)
+
+a.image('CSIRO.png',width=150)
+b.image('ANU.png',width=150)
+c.image('DFAT.png',width=150)
 # st.write("__Please share your experience here__")
