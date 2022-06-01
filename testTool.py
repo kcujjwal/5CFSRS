@@ -6,6 +6,7 @@ from streamlit import caching
 import streamlit.components.v1 as components, html
 from google1 import main as mn
 import plotly.express as px
+import base64
 
 
 import copy
@@ -209,6 +210,19 @@ trans_data = org_data.transpose()
 
 
 ## *********** FUNCTIONS ***********
+
+def displayPDF(file,st):
+    # Opening file from file path
+    with open(file, "rb") as f:
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+
+    # Embedding PDF in HTML
+    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="1200" height="1000" type="application/pdf"></iframe>'
+
+    # Displaying File
+    st.write(pdf_display, unsafe_allow_html=True)
+
+
 def showOption():
 
     opts = ['Country','Indicator']
@@ -1058,18 +1072,22 @@ def displayGuage(temp_df,conPlots):
 ###### SIDEBAR *****************
 
 
-
+# displayPDF("About.pdf",st)
 
 
 
 st.sidebar.image("icon.png",width =150)
+
+# if (st.sidebar.button("About")):
+#     st.empty()
+#     displayPDF("About.pdf",st)
 st.sidebar.title('Control Center')
 # st.sidebar.markdown('Control Parameters Here')
 # st.sidebar.checkbox("Select a Country", True, key=1)
 
 analysisType = st.sidebar.radio(
      "Visualization By:",
-     ('World Map','Descriptive Analysis', 'Comparative Analysis','Scenario Analysis',"Best Interventions"))
+     ("About/Help",'World Map','Descriptive Analysis', 'Comparative Analysis','Scenario Analysis',"Best Interventions"),index =1)
 # print(analysisType)
 
 countries = org_data.index
@@ -1174,7 +1192,7 @@ elif((analysisType=="Scenario Analysis")):
     doSA1(fd,scale,shock,intensity_score,1,conPlots,c1,c2,country=country)
     # st.markdown("# _Page will be up and running soon.... Hang on!!!_")
 
-else:
+elif(analysisType=="Best Interventions"):
     # st.markdown("# _Page will be up and running soon.... Hang on!!!_")
     mn(spreadsheets)
     # temp_df = pd.read_csv('survey_data.csv')
@@ -1214,7 +1232,8 @@ else:
         conPlots.subheader("Top 3 Interventions")
         displayGuage(temp_df,conPlots)
 
-
+else:
+    displayPDF("About.pdf",st)
     
 my_html1 = """<h2>Please share your experience of using this tool 
     <a href="https://forms.gle/JpgirdYtypVdiLC27" target="_blank">HERE</a> </h2>
