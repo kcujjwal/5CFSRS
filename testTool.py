@@ -59,7 +59,7 @@ all_factors1 = {
      'agprod':'Agricultural Production Index',
      'agVol':'Agricultural Production Volatility',
     'obesity':'Obsesity Prevelance',
-    'foodsafe': 'Food Safetly',
+    'foodsafe': 'Food Safety',
      'drinking':'Drinking Water',
      'Micro': 'Micronutrient Availability',
      'Protein': 'Protein Quality',
@@ -128,7 +128,7 @@ all_factors = {
      'Food Diversity Score':'Diversity' ,
 
 
-     'Social':'social' ,
+     'Social Capital':'social' ,
      'Urban Absorption Capacity':'urbancap',
      'Presence of SafetyNet':'safetynet' ,
     'Food Policy Score':'policyfood',
@@ -196,6 +196,8 @@ DATA_URL = r"C:\Users\kc003\OneDrive - CSIRO\Projects\Composite Score\masterData
 
 alldata = pd.read_csv("LL1.csv")
 
+alldata1 = pd.read_csv("restructure.csv")
+
 years = range(2012,2021)
 dataColl = {}
 for i in years:
@@ -229,7 +231,7 @@ def showOption():
     op = st.sidebar.selectbox('Analysis by:',opts)
     return op
 
-def showPlot(df,c1,c2,index = "country",visType="Des",check="nice"):
+def showPlot(df,conPlots,index = "country",visType="Des",check="nice",present=pd.DataFrame()):
     # print(df)
     # df=df.transpose()
     # c1.write(df)
@@ -237,11 +239,20 @@ def showPlot(df,c1,c2,index = "country",visType="Des",check="nice"):
     plt.style.use(plt_style)
     for i in df.columns:
         # print(i)
-        if i in all_factors1.keys():
-            c1.subheader(str.upper(all_factors1[i]))
-        else:
-            c1.subheader(str.upper(i))
+        
+        d1,d2 = conPlots.columns(2)
 
+        if i in all_factors1.keys():
+            d1.subheader(str.upper(all_factors1[i]))
+        else:
+            d1.subheader(str.upper(i))
+        
+        # if i in all_factors1.keys():
+        #     d2.subheader(str.upper(all_factors1[i]))
+        # else:
+        #     d2.subheader(str.upper(i))
+
+        
 
         print(df.head())
 
@@ -251,12 +262,45 @@ def showPlot(df,c1,c2,index = "country",visType="Des",check="nice"):
             df["var_name"] = [all_factors1[i] for i in df.index]
         else:
              df["var_name"]  = df.index
+
+        if(index!="country"):
+            a1,a2,a3,a4,a5,a6 = conPlots.columns(6)
+
+            if(present.empty):       
+
+                a1.metric(label="Food System Resilience Score",value=df.loc[df["var_name"]=="Food System Resilience Score",i])
+                a2.metric(label="Natural Capital",value=df.loc[df["var_name"]=="Natural Capital",i])
+                a3.metric(label="Human Capital",value=df.loc[df["var_name"]=="Human Capital",i])
+                a4.metric(label="Social Capital",value=df.loc[df["var_name"]=="Social Capital",i])
+                a5.metric(label="Financial Capital",value=df.loc[df["var_name"]=="Financial Capital",i])
+                a6.metric(label="Manufactured Capital",value=df.loc[df["var_name"]=="Manufactured Capital",i])
+            else:
+                print(present.head())
+                print("OKOK")
+                print(df.head())
+                # a1.metric(label="Food System Resilience Score",value=10,delta=str(np.round(df.loc[df["var_name"]=="Food System Resilience Score",i][0],2))+" %")
+                # a2.metric(label="Natural Capital",value=10,delta=str(np.round(df.loc[df["var_name"]=="Natural Capital",i][0],2))+" %")
+                # a3.metric(label="Human Capital",value=10,delta=str(np.round(df.loc[df["var_name"]=="Human Capital",i][0],2))+" %")
+                # a4.metric(label="Social Capital",value=10,delta=str(np.round(df.loc[df["var_name"]=="Social Capital",i][0],2))+" %")
+                # a5.metric(label="Financial Capital",value=10,delta=str(np.round(df.loc[df["var_name"]=="Financial Capital",i][0],2))+" %")
+                # a6.metric(label="Manufactured Capital",value=10,delta=str(np.round(df.loc[df["var_name"]=="Manufactured Capital",i][0],2)) +" %")               
+                
+                #
+                a1.metric(label="Food System Resilience Score",value=present.loc[present.index=="Score",i][0],delta=str(np.round(df.loc[df["var_name"]=="Food System Resilience Score",i][0],2)))
+                a2.metric(label="Natural Capital",value=present.loc[present.index=="natural",i][0],delta=str(np.round(df.loc[df["var_name"]=="Natural Capital",i][0],2)))
+                a3.metric(label="Human Capital",value=present.loc[present.index=="human",i][0],delta=str(np.round(df.loc[df["var_name"]=="Human Capital",i][0],2)))
+                a4.metric(label="Social Capital",value=present.loc[present.index=="social",i][0],delta=str(np.round(df.loc[df["var_name"]=="Social Capital",i][0],2)))
+                a5.metric(label="Financial Capital",value=present.loc[present.index=="financial",i][0],delta=str(np.round(df.loc[df["var_name"]=="Financial Capital",i][0],2)))
+                a6.metric(label="Manufactured Capital",value=present.loc[present.index=="manufactured",i][0],delta=str(np.round(df.loc[df["var_name"]=="Manufactured Capital",i][0],2)))   
             
-    
        
         best_10 = df.sort_values(i,ascending = False).head(10)
 
         print(best_10)
+
+        c1,c2 = conPlots.columns(2)
+
+        # st.metric(label="Food System Resilience Score",value=df.loc[df["var_name"]=="Food System Resilience Score",i])
 
         fig1 = px.bar(best_10, x = i,y = "var_name",orientation='h')
         
@@ -268,10 +312,7 @@ def showPlot(df,c1,c2,index = "country",visType="Des",check="nice"):
     
         c1.plotly_chart(fig1)
 
-        if i in all_factors1.keys():
-            c2.subheader(str.upper(all_factors1[i]))
-        else:
-            c2.subheader(str.upper(i))
+
 
         worst_10 = df.sort_values(i,ascending = True).head(10)
         print(worst_10)
@@ -290,13 +331,18 @@ def showPlot(df,c1,c2,index = "country",visType="Des",check="nice"):
         # c1.write("Most Resilient Nations")
         # c2.markdown('__WEAKNESSES__')
         c2.plotly_chart(fig2)
+
+        del d1,d2,c1,c2
+
+        if index!="country":
+            del a1,a2,a3,a4,a5,a6
             
         
         
-def linePlot(df,countrySelect,c1,c2):
+def linePlot(df,countrySelect,conPlots):
     df.index.name=None
     # c1.write(df)
-    
+    c1,c2 = conPlots.columns(2)
     if(len(countrySelect)!=0):
         df =df[df.index.isin(countrySelect)]
         check = df.reset_index().set_index("Year")
@@ -428,7 +474,7 @@ def visualizeMap1(gdf,conPlots):
     #  gdf.index = gdf.name
     #  gdf["Year"]=gdf["Year"].astype("int")
 
-     fig = px.choropleth(gdf, geojson=gdf.geometry, locations=gdf.index, color=indicator, width = 1250,color_continuous_scale="plasma",range_color=(0, 100),
+     fig = px.choropleth(gdf, geojson=gdf.geometry, locations=gdf.index, color="Value", width = 1250,color_continuous_scale="plasma",range_color=(0, 100),
      hover_name=gdf.index,animation_frame="Year")
      fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
      fig.update_geos(fitbounds="locations", visible=False)
@@ -461,8 +507,9 @@ def visualizeMapan(c1,c2,conPlots):
 
 
 
-def visualizeOp(op,c1,c2,yearChoice=2020):
+def visualizeOp(op,conPlots,yearChoice=2020):
     global dataColl
+    
     # countries = dataColl[yearChoice].index
     # global conPlots
     # conPlots.write("The default year is 2020")
@@ -490,7 +537,7 @@ def visualizeOp(op,c1,c2,yearChoice=2020):
         df = org_data[org_data.index.isin(countrySelect)].transpose()
         print(df)
 
-        showPlot(df,c1,c2,index='indicator')
+        showPlot(df,conPlots,index='indicator')
      
     else:
         indSelect1 = st.sidebar.multiselect('Select indicator(s)',all_factors.keys())
@@ -500,10 +547,10 @@ def visualizeOp(op,c1,c2,yearChoice=2020):
         trans_data=dataColl[yearChoice]
         df1 = trans_data[indSelect]
         # print(df1)
-        showPlot(df1,c1,c2,index='country')
+        showPlot(df1,conPlots,index='country')
   
 
-def visualizeComp(op,c1,c2,conPlots,choiceDiff):
+def visualizeComp(op,conPlots,choiceDiff):
     global dataColl
     # global conPlots
     # conPlots.write("The default year is 2020")
@@ -524,9 +571,11 @@ def visualizeComp(op,c1,c2,conPlots,choiceDiff):
         # df = dataColl[yearChoice[0]].subtract(dataColl[yearChoice[1]])[countrySelect]
         df = dataColl[yearChoice[0]].subtract(dataColl[yearChoice[1]])
         df = df[df.index.isin(countrySelect)].transpose()
+        original = dataColl[yearChoice[0]][dataColl[yearChoice[0]].index.isin(countrySelect)].transpose()
         # df = org_data[countrySelect]
-        print(df)
-        showPlot(df,c1,c2,"Comp","indx")
+        print('*****')
+        print(original.head())
+        showPlot(df,conPlots,"Comp","indx",present = original)
     elif op =="Countryvs":
         countrySelect = st.sidebar.multiselect('Select Country(ies)',countries)
         indexes = ["Score","natural","human","social","financial","manufactured","Year"]
@@ -539,7 +588,7 @@ def visualizeComp(op,c1,c2,conPlots,choiceDiff):
             df =pd.concat([df,tempData[i]])
         # print(df)
         df1= df[indexes]
-        linePlot(df1,countrySelect,c1,c2)
+        linePlot(df1,countrySelect,conPlots)
 
     elif op =="Capitals":
         capital = st.sidebar.selectbox("Choose a capital", ["Natural", "Human","Social","Financial","Manufactured"])
@@ -579,7 +628,7 @@ def visualizeComp(op,c1,c2,conPlots,choiceDiff):
         indSelect = [all_factors[i] for i in indSelect1]
         df1 = dataColl[yearChoice[0]].subtract(dataColl[yearChoice[1]])[indSelect]
         print(df1)
-        showPlot(df1,c1,c2,index="country",visType="Comp")
+        showPlot(df1,conPlots,index="country",visType="Comp")
 
 
 
@@ -1110,11 +1159,13 @@ world = world[(world.pop_est>0) & (world.name!="Antarctica")].drop(columns =["po
 world['name'] = world['name'].str.lower() 
 
 if(analysisType=="World Map"):
-    df = alldata.copy()
+    df = alldata1.copy()
+    print(df.head())
     # visualizeMap(c1,c2,conPlots)    
     indicator1 = st.sidebar.selectbox('Indicator',all_factors.keys())
     indicator = all_factors[indicator1]
-    df = df[["Year","Country",indicator]]
+    df = df[["Year","Country",'Indicator',"Value"]][df["Indicator"]==indicator1]
+    print(df.head())
 
     df["Country"]=df["Country"].str.lower()
     df["Year"] = df["Year"].astype("int")
@@ -1125,6 +1176,8 @@ if(analysisType=="World Map"):
     merged = pd.merge(left = world, right = df, right_on = "Country", left_on = 'name', how = 'left')
 
     gdf = geopandas.GeoDataFrame(merged, geometry="geometry").dropna()
+
+    print(gdf.head())
     gdf.index = gdf.name
     gdf["Year"]=gdf["Year"].astype("int")
     conPlots.subheader(str.upper(indicator1))
@@ -1143,7 +1196,7 @@ elif(analysisType=="Descriptive Analysis"):
     #     visualizeOp(op,c1,c2)
     # else:
     #     visualizeOp(op,c1,c2,yearChoice)
-    visualizeOp(op,c1,c2,yearChoice)
+    visualizeOp(op,conPlots,yearChoice)
 
 
 elif(analysisType=="Comparative Analysis"):
@@ -1155,7 +1208,7 @@ elif(analysisType=="Comparative Analysis"):
         op = "Countryvs"
     else:
         op = choiceDiff
-    visualizeComp(op,c1,c2,conPlots,choiceDiff)
+    visualizeComp(op,conPlots,choiceDiff)
 
 
 elif((analysisType=="Scenario Analysis")):
@@ -1247,4 +1300,5 @@ a,b,c = st.columns(3)
 a.image('CSIRO.png',width=150)
 b.image('ANU.png',width=150)
 c.image('DFAT.png',width=150)
-# st.write("__Please share your experience here__")
+# st
+# .write("__Please share your experience here__")
