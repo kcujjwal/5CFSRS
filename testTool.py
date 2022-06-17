@@ -1255,7 +1255,7 @@ st.sidebar.title('Control Center')
 
 analysisType = st.sidebar.radio(
      "Visualization By:",
-     ("About/Help",'World Map','Descriptive Analysis', 'Comparative Analysis','Scenario Analysis',"Best Interventions"),index =0)
+     ("About/Help",'World Map','Descriptive Analysis', 'Comparative Analysis','Scenario Analysis',"Best Interventions"),index =1)
 # print(analysisType)
 
 countries = org_data.index
@@ -1408,15 +1408,20 @@ else:
     displayAbout(st)
     # displayPDF("About.pdf",st)
     
-my_html1 = """<h2>Please share your experience of using this tool 
-    <a href="https://forms.gle/JpgirdYtypVdiLC27" target="_blank">HERE</a> </h2>
+my_html1 = """<h3>Please share your experience of using this tool 
+    <a href="https://forms.gle/JpgirdYtypVdiLC27" target="_blank">HERE</a> </h3>
     """
 
 expander = st.expander("FAQ")
 expander.write("Here you could put in some really, really long explanations...")
-components.html(my_html1)
-a,b,c = st.columns(3)
+with st.sidebar:
+    components.html(my_html1)
 
+
+
+components.html(my_html1)
+
+a,b,c = st.columns(3)
 a.image('CSIRO.png',width=150)
 b.image('ANU.png',width=150)
 c.image('DFAT.png',width=150)
