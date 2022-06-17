@@ -1255,7 +1255,7 @@ st.sidebar.title('Control Center')
 
 analysisType = st.sidebar.radio(
      "Visualization By:",
-     ("About/Help",'World Map','Descriptive Analysis', 'Comparative Analysis','Scenario Analysis',"Best Interventions"),index =1)
+     ("About/Help",'World Map','Descriptive Analysis', 'Comparative Analysis','Scenario Analysis',"Best Interventions"),index =0)
 # print(analysisType)
 
 countries = org_data.index
