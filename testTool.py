@@ -414,6 +414,7 @@ def showPlot(df,conPlots,index = "country",visType="Des",check="nice",present=pd
             
        
         best_10 = df.sort_values(i,ascending = False).head(10)
+        best_10[i] = best_10[i].apply(np.round)
 
         print(best_10)
 
@@ -421,11 +422,12 @@ def showPlot(df,conPlots,index = "country",visType="Des",check="nice",present=pd
 
         # st.metric(label="Food System Resilience Score",value=df.loc[df["var_name"]=="Food System Resilience Score",i])
 
-        fig1 = px.bar(best_10, x = i,y = "var_name",orientation='h')
+        fig1 = px.bar(best_10, x = i,y = "var_name",orientation='h',text=i)
         
         fig1.update_layout(xaxis_range=[0,100],yaxis_title=None, xaxis_title=None)
         fig1.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
         fig1.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
+        fig1.update_traces(textposition='outside')
         # c1.write("Most Resilient Nations")
         # c1.markdown('__STRENGTHS__')
     
@@ -434,14 +436,17 @@ def showPlot(df,conPlots,index = "country",visType="Des",check="nice",present=pd
 
 
         worst_10 = df.sort_values(i,ascending = True).head(10)
+        worst_10[i] = worst_10[i].apply(np.round)
         print(worst_10)
 
-        fig2 = px.bar(worst_10, x = i,y = "var_name",orientation='h')
+        fig2 = px.bar(worst_10, x = i,y = "var_name",orientation='h',text=i)
 
 
         fig2.update_layout(xaxis_range=[0,100],yaxis_title=None, xaxis_title=None)
         fig2.update_xaxes(tickfont=dict(size =15, family = "Arial Black"))
+        fig2.update_traces(textposition='outside')
         fig2.update_yaxes(tickfont=dict(size =15,family = "Arial Black"))
+
 
         if(visType=="Des"):
             fig2.update_layout(xaxis_range=[0,100],yaxis_title=None, xaxis_title=None)
