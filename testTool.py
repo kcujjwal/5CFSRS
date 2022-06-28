@@ -228,6 +228,8 @@ It displays the basic information about the tool along with its components. It a
 
 **2. Functionalities**
 
+![Test](Decision.PNG)
+
 **2.1 Situational Awareness**
 
 The component helps derive a clear understanding of the strengths and weaknesses of national food systems. The world map, descriptive analysis and comparative analysis serve to enable situational awareness.
@@ -1260,7 +1262,7 @@ st.sidebar.title('Control Center')
 
 analysisType = st.sidebar.radio(
      "Visualization By:",
-     ("About/Help",'World Map','Descriptive Analysis', 'Comparative Analysis','Scenario Analysis',"Best Interventions"),index =0)
+     ("About/Help",'PowerBI Dashboard','World Map','Descriptive Analysis', 'Comparative Analysis','Scenario Analysis',"Best Interventions"),index =0)
 # print(analysisType)
 
 countries = org_data.index
@@ -1307,6 +1309,16 @@ if(analysisType=="World Map"):
     conPlots.subheader(str.upper(indicator1))
     visualizeMap1(gdf,conPlots)
 
+elif(analysisType=="PowerBI Dashboard"):
+    # displayPowerBI = """
+    # #  <iframe title="Prototype_RIFA2.0_Pacific" width="1140" height="2000" src="https://app.powerbi.com/reportEmbed?reportId=15e59fe4-4b41-4491-a88a-1e9ebe5c5ec2&autoAuth=true&ctid=15eb5d55-1991-46bc-8da7-ab25234dee08&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLWF1c3RyYWxpYS1zb3V0aGVhc3QtYi1wcmltYXJ5LXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyJ9" frameborder="0" allowFullScreen="true"></iframe>  
+    # <embed title="Prototype_RIFA2.0_Pacific" width="1140" height="2000" src="https://app.powerbi.com/reportEmbed?reportId=15e59fe4-4b41-4491-a88a-1e9ebe5c5ec2&autoAuth=true&ctid=15eb5d55-1991-46bc-8da7-ab25234dee08&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLWF1c3RyYWxpYS1zb3V0aGVhc3QtYi1wcmltYXJ5LXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyJ9"/>  
+
+    # """
+    # with conPlots:
+    #     components.html(displayPowerBI)
+    st.markdown("""<iframe title="Prototype_RIFA2.0_Pacific" width="1140" height="2000" src="https://app.powerbi.com/reportEmbed?reportId=15e59fe4-4b41-4491-a88a-1e9ebe5c5ec2&autoAuth=true&ctid=15eb5d55-1991-46bc-8da7-ab25234dee08&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLWF1c3RyYWxpYS1zb3V0aGVhc3QtYi1wcmltYXJ5LXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyJ9" frameborder="0" allowFullScreen="true"></iframe>""",unsafe_allow_html=True) 
+ 
 
 
 elif(analysisType=="Descriptive Analysis"):
@@ -1417,18 +1429,35 @@ my_html1 = """<h3>Please share your experience of using this tool
     <a href="https://forms.gle/JpgirdYtypVdiLC27" target="_blank">HERE</a> </h3>
     """
 
-expander = st.expander("FAQ")
-expander.write("Here you could put in some really, really long explanations...")
-with st.sidebar:
+
+if(analysisType!="PowerBI Dashboard"):
+    expander = st.expander("FAQ")
+    expander.write("Here you could put in some really, really long explanations...")
+    with st.sidebar:
+        components.html(my_html1)
+
+
+
     components.html(my_html1)
 
+    a,b,c = st.columns(3)
+    a.image('CSIRO.png',width=150)
+    b.image('ANU.png',width=150)
+    c.image('DFAT.png',width=150)
+    
+    
+# expander = st.expander("FAQ")
+# expander.write("Here you could put in some really, really long explanations...")
+# with st.sidebar:
+#     components.html(my_html1)
 
 
-components.html(my_html1)
 
-a,b,c = st.columns(3)
-a.image('CSIRO.png',width=150)
-b.image('ANU.png',width=150)
-c.image('DFAT.png',width=150)
+# components.html(my_html1)
+
+# a,b,c = st.columns(3)
+# a.image('CSIRO.png',width=150)
+# b.image('ANU.png',width=150)
+# c.image('DFAT.png',width=150)
 # st
 # .write("__Please share your experience here__")
