@@ -1310,6 +1310,11 @@ if(analysisType=="World Map"):
     visualizeMap1(gdf,conPlots)
 
 elif(analysisType=="PowerBI Dashboard"):
+    email = """<h3>If you can not have an access to the PowerBI Dashboard, Please send your name and email address to 
+    <a href="emailto:Ujjwal.KC@csiro.au" target="_blank">Ujjwal.KC@csiro.au</a> </h3>
+    """
+
+    st.markdown(email,unsafe_allow_html=True)
     # displayPowerBI = """
     # #  <iframe title="Prototype_RIFA2.0_Pacific" width="1140" height="2000" src="https://app.powerbi.com/reportEmbed?reportId=15e59fe4-4b41-4491-a88a-1e9ebe5c5ec2&autoAuth=true&ctid=15eb5d55-1991-46bc-8da7-ab25234dee08&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLWF1c3RyYWxpYS1zb3V0aGVhc3QtYi1wcmltYXJ5LXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyJ9" frameborder="0" allowFullScreen="true"></iframe>  
     # <embed title="Prototype_RIFA2.0_Pacific" width="1140" height="2000" src="https://app.powerbi.com/reportEmbed?reportId=15e59fe4-4b41-4491-a88a-1e9ebe5c5ec2&autoAuth=true&ctid=15eb5d55-1991-46bc-8da7-ab25234dee08&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLWF1c3RyYWxpYS1zb3V0aGVhc3QtYi1wcmltYXJ5LXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyJ9"/>  
