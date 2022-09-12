@@ -98,7 +98,7 @@ alldata1 = pd.read_csv("restructure.csv")
 def visualizeMap1(gdf):
 
 
-     fig = px.choropleth(gdf, geojson=gdf.geometry, locations=gdf.index, color="Value", width = 1000,color_continuous_scale="Viridis",range_color=(0, 100),
+     fig = px.choropleth(gdf, geojson=gdf.geometry, locations=gdf.index, color="Value", width = 1000,color_continuous_scale="hsv",range_color=(0, 100),
      hover_name=gdf.index,animation_frame="Year")
      fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
      fig.update_geos(fitbounds="locations", visible=False)
