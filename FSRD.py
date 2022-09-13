@@ -185,7 +185,7 @@ st.set_page_config(page_title="Food Systems Resilience Diagnostics", layout="wid
 
 a,b,c = st.sidebar.columns([1,5,1])
 a.write('')
-b.image("FSDR1.png")
+b.image("FSDR_1.png")
 c.write('')
 
 
